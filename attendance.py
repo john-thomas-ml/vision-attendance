@@ -22,8 +22,6 @@ THRESHOLD = 10  # 600 seconds = 10 minutes
 
 cap = cv2.VideoCapture(0) 
 
-import os
-
 def extract_name(path):
     parts = os.path.normpath(path).split(os.path.sep)
     return parts[-2] if len(parts) > 1 else "Unknown"
@@ -70,7 +68,6 @@ def update_timer(name):
     conn.commit()
 
 
-
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -81,23 +78,23 @@ while True:
         cv2.imwrite("temp.jpg", frame) 
         result = DeepFace.find(img_path="temp.jpg", db_path="dataset/", model_name="Facenet", detector_backend="opencv")
 
+        if isinstance(result, list) and len(result) > 0:
+            for res in result:
+                if not res.empty:
+                    name = extract_name(res['identity'][0])
+                    print(f"🔍 Recognized: {name}")
+                    update_timer(name)
 
-        if isinstance(result, list) and len(result) > 0 and not result[0].empty:
-            name = extract_name(result[0]['identity'][0])
-            print(f"🔍 Recognized: {name}")
-            update_timer(name)
-
-            cursor.execute("SELECT marked, accumulated_time FROM attendance WHERE name = ?", (name,))
-            status = cursor.fetchone()
-            if status:
-                marked, accumulated_time = status
-                if marked == 1:
-                    print(f"✅ {name} is officially marked as PRESENT! (Total Time: {accumulated_time:.2f}s)")
-                else:
-                    print(f"⏳ {name} is still being tracked... (Accumulated: {accumulated_time:.2f}s)")
-            else:
-                print(f"⚠️ No database record found for {name}")
-
+                    cursor.execute("SELECT marked, accumulated_time FROM attendance WHERE name = ?", (name,))
+                    status = cursor.fetchone()
+                    if status:
+                        marked, accumulated_time = status
+                        if marked == 1:
+                            print(f"✅ {name} is officially marked as PRESENT! (Total Time: {accumulated_time:.2f}s)")
+                        else:
+                            print(f"⏳ {name} is still being tracked... (Accumulated: {accumulated_time:.2f}s)")
+                    else:
+                        print(f"⚠️ No database record found for {name}")
         else:
             print("⚠️ No known face recognized.")
 
