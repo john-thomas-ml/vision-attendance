@@ -57,9 +57,9 @@ def update_timer(name):
 
         if new_accumulated >= THRESHOLD and not is_marked(name):
             cursor.execute("UPDATE attendance SET marked = 1 WHERE name = ?", (name,))
-            print(f"✅ {name} is officially marked as PRESENT! (Total Time: {new_accumulated:.2f}s)")
+            print(f" {name} is officially marked as PRESENT! (Total Time: {new_accumulated:.2f}s)")
         else:
-            print(f"⏳ {name} is being tracked. Accumulated Time: {new_accumulated:.2f} seconds.")
+            print(f" {name} is being tracked. Accumulated Time: {new_accumulated:.2f} seconds.")
 
     else:
         cursor.execute("INSERT INTO attendance (name, accumulated_time, last_seen) VALUES (?, 0, ?)",
@@ -71,7 +71,7 @@ def update_timer(name):
 while True:
     ret, frame = cap.read()
     if not ret:
-        print("❌ Error: Could not read frame.")
+        print(" Error: Could not read frame.")
         break
     
     try:
@@ -82,7 +82,7 @@ while True:
             for res in result:
                 if not res.empty:
                     name = extract_name(res['identity'][0])
-                    print(f"🔍 Recognized: {name}")
+                    print(f" Recognized: {name}")
                     update_timer(name)
 
                     cursor.execute("SELECT marked, accumulated_time FROM attendance WHERE name = ?", (name,))
@@ -90,16 +90,16 @@ while True:
                     if status:
                         marked, accumulated_time = status
                         if marked == 1:
-                            print(f"✅ {name} is officially marked as PRESENT! (Total Time: {accumulated_time:.2f}s)")
+                            print(f" {name} is officially marked as PRESENT! (Total Time: {accumulated_time:.2f}s)")
                         else:
-                            print(f"⏳ {name} is still being tracked... (Accumulated: {accumulated_time:.2f}s)")
+                            print(f" {name} is still being tracked... (Accumulated: {accumulated_time:.2f}s)")
                     else:
-                        print(f"⚠️ No database record found for {name}")
+                        print(f" No database record found for {name}")
         else:
-            print("⚠️ No known face recognized.")
+            print(" No known face recognized.")
 
     except Exception as e:
-        print(f"❌ Error in face recognition: {str(e)}")
+        print(f" Error in face recognition: {str(e)}")
     
     cv2.imshow("Attendance System", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
