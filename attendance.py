@@ -11,7 +11,7 @@ from PIL import Image
 from ultralytics import YOLO
 
 # Parameters
-model_dir = "C:/fine_tuned_arcface.pth"
+model_dir = "C:/fine_tuned_facenet.pth"
 yolo_model_path = "C:/yolov8n-face.pt"
 image_size = 160
 num_classes = 4  # Number of students (John, Nelda, Parvathy, Safran)
@@ -157,10 +157,10 @@ def process_video(reference_embeddings, conn, cursor, threshold=COSINE_THRESHOLD
     # Load YOLOv8 face detection model
     yolo_model = YOLO(yolo_model_path)  # Use the face-specific YOLOv8 model
 
-    # Load fine-tuned ArcFace model for recognition
-    arcface_model = InceptionResnetV1(pretrained=None, classify=False, num_classes=num_classes)
-    arcface_model.load_state_dict(torch.load(model_dir))
-    arcface_model.eval()
+    # Load fine-tuned FaceNet model for recognition
+    facenet_model = InceptionResnetV1(pretrained=None, classify=False, num_classes=num_classes)
+    facenet_model.load_state_dict(torch.load(model_dir))
+    facenet_model.eval()
 
     transform = transforms.Compose([
         transforms.ToPILImage(),
@@ -203,7 +203,7 @@ def process_video(reference_embeddings, conn, cursor, threshold=COSINE_THRESHOLD
                     if face_img.size == 0:  # Skip empty crops
                         continue
 
-                    # Convert to RGB and normalize for ArcFace
+                    # Convert to RGB and normalize for FaceNet
                     face_img = cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)
                     centroid = (x, y)  # Centroid of the bounding box
                     current_faces.append({
@@ -261,7 +261,7 @@ def process_video(reference_embeddings, conn, cursor, threshold=COSINE_THRESHOLD
                 face_imgs = [transform(track["face"]) for track in face_tracks.values()]
                 face_imgs = torch.stack(face_imgs)
                 with torch.no_grad():
-                    embeddings = arcface_model(face_imgs).numpy()
+                    embeddings = facenet_model(face_imgs).numpy()
 
                 for idx, (fid, track) in enumerate(face_tracks.items()):
                     embedding = embeddings[idx].flatten()
