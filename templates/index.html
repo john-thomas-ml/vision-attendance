@@ -1,0 +1,462 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Attendance System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-gap: 20px;
+        }
+        
+        header {
+            grid-column: 1 / -1;
+            background-color: #3a86ff;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .video-container {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        
+        .video-feed {
+            width: 100%;
+            height: 480px;
+            background-color: #000;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .video-feed img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #3a86ff;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #ff006e;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .timer-card, .status-card {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .student-list {
+            list-style: none;
+        }
+        
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-item:last-child {
+            border-bottom: none;
+        }
+        
+        .student-name {
+            font-weight: 500;
+        }
+        
+        .student-timer {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        .status-present {
+            color: #38b000;
+            font-weight: 600;
+        }
+        
+        .status-absent {
+            color: #d90429;
+            font-weight: 600;
+        }
+        
+        .placeholder-text {
+            color: #6c757d;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Toggle button style */
+        #toggleButton.start {
+            background-color: #3a86ff;
+        }
+        
+        #toggleButton.stop {
+            background-color: #ff006e;
+        }
+        
+        .settings-container {
+            padding: 0 10px;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .threshold-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .threshold-display {
+            font-size: 14px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Automated Attendance System</h1>
+        </header>
+        
+        <div class="video-container">
+            <div class="video-feed" id="videoFeed">
+                <div class="placeholder-text">Camera feed will appear here when started</div>
+            </div>
+            <div class="controls">
+                <button id="toggleButton" class="btn btn-primary start">Start Camera</button>
+                <button id="clearButton" class="btn btn-danger">Clear Records</button>
+            </div>
+        </div>
+        
+        <div class="info-container">
+            <div class="timer-card">
+                <h2 class="card-title">Student Timers</h2>
+                <ul class="student-list" id="timerList">
+                    <!-- Timer data will be loaded here -->
+                    <li class="student-item">
+                        <span class="student-name">Loading...</span>
+                        <span class="student-timer">0:00</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="timer-card">
+                <h2 class="card-title">Attendance Settings</h2>
+                <div class="settings-container">
+                    <div class="setting-item">
+                        <label for="thresholdInput">Attendance Threshold (seconds):</label>
+                        <input type="number" id="thresholdInput" class="threshold-input" value="300" min="1">
+                        <button id="updateThresholdBtn" class="btn btn-primary btn-sm">Update</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <h2 class="card-title">
+                    Attendance Status 
+                    <span class="threshold-display" id="thresholdDisplay">(Threshold: 5:00)</span>
+                </h2>
+                <ul class="student-list" id="statusList">
+                    <!-- Status data will be loaded here -->
+                    <li class="student-item">
+                        <span class="student-name">Loading...</span>
+                        <span class="status-absent">Loading...</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const videoFeed = document.getElementById('videoFeed');
+        const toggleButton = document.getElementById('toggleButton');
+        const clearButton = document.getElementById('clearButton');
+        const timerList = document.getElementById('timerList');
+        const statusList = document.getElementById('statusList');
+        const thresholdInput = document.getElementById('thresholdInput');
+        const updateThresholdBtn = document.getElementById('updateThresholdBtn');
+        const thresholdDisplay = document.getElementById('thresholdDisplay');
+        
+        // State
+        let isStreaming = false;
+        let attendanceInterval;
+        
+        // Initialize with default value
+        let currentThreshold = 300; // 5 minutes in seconds
+        thresholdInput.value = currentThreshold;
+        updateThresholdDisplay();
+        
+        // Format time in seconds to mm:ss
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update threshold display
+        function updateThresholdDisplay() {
+            const minutes = Math.floor(currentThreshold / 60);
+            const seconds = Math.floor(currentThreshold % 60);
+            thresholdDisplay.textContent = `(Threshold: ${minutes}:${seconds.toString().padStart(2, '0')})`;
+        }
+        
+        // Update attendance data
+        function updateAttendance() {
+            fetch('/get_attendance')
+                .then(response => response.json())
+                .then(data => {
+                    // Update timer list
+                    let timerHtml = '';
+                    for (const [name, info] of Object.entries(data)) {
+                        timerHtml += `
+                            <li class="student-item">
+                                <span class="student-name">${name}</span>
+                                <span class="student-timer">${formatTime(info.time)}</span>
+                            </li>
+                        `;
+                    }
+                    timerList.innerHTML = timerHtml;
+                    
+                    // Update status list
+                    let statusHtml = '';
+                    for (const [name, info] of Object.entries(data)) {
+                        const statusClass = info.status === 'Present' ? 'status-present' : 'status-absent';
+                        statusHtml += `
+                            <li class="student-item">
+                                <span class="student-name">${name}</span>
+                                <span class="${statusClass}">${info.status}</span>
+                            </li>
+                        `;
+                    }
+                    statusList.innerHTML = statusHtml;
+                })
+                .catch(error => console.error('Error fetching attendance data:', error));
+        }
+        
+        // Start camera stream
+        function startStream() {
+            fetch('/start_stream', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    isStreaming = true;
+                    videoFeed.innerHTML = '<img src="/video_feed" alt="Camera Feed">';
+                    toggleButton.textContent = 'Stop Camera';
+                    toggleButton.classList.remove('start');
+                    toggleButton.classList.add('stop');
+                    
+                    // Start attendance update interval
+                    attendanceInterval = setInterval(updateAttendance, 1000);
+                }
+            })
+            .catch(error => console.error('Error starting stream:', error));
+        }
+        
+        // Stop camera stream
+        function stopStream() {
+            fetch('/stop_stream', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    isStreaming = false;
+                    videoFeed.innerHTML = '<div class="placeholder-text">Camera feed will appear here when started</div>';
+                    toggleButton.textContent = 'Start Camera';
+                    toggleButton.classList.remove('stop');
+                    toggleButton.classList.add('start');
+                    
+                    // Clear attendance update interval
+                    clearInterval(attendanceInterval);
+                    
+                    // Get final attendance update
+                    updateAttendance();
+                }
+            })
+            .catch(error => console.error('Error stopping stream:', error));
+        }
+        
+        // Clear attendance records
+        function clearAttendance() {
+            fetch('/clear_attendance', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Immediately update the attendance display
+                    updateAttendance();
+                    
+                    // Clear the local UI immediately
+                    timerList.innerHTML = '';
+                    statusList.innerHTML = '';
+                    
+                    // Regenerate empty entries for all students
+                    const students = ['John', 'Nelda', 'Parvathy', 'Safran'];
+                    let timerHtml = '';
+                    let statusHtml = '';
+                    
+                    students.forEach(student => {
+                        timerHtml += `
+                            <li class="student-item">
+                                <span class="student-name">${student}</span>
+                                <span class="student-timer">0:00</span>
+                            </li>
+                        `;
+                        
+                        statusHtml += `
+                            <li class="student-item">
+                                <span class="student-name">${student}</span>
+                                <span class="status-absent">Absent</span>
+                            </li>
+                        `;
+                    });
+                    
+                    timerList.innerHTML = timerHtml;
+                    statusList.innerHTML = statusHtml;
+                }
+            })
+            .catch(error => console.error('Error clearing attendance:', error));
+        }
+        
+        // Event listeners
+        toggleButton.addEventListener('click', () => {
+            if (isStreaming) {
+                stopStream();
+            } else {
+                startStream();
+            }
+        });
+        
+        clearButton.addEventListener('click', clearAttendance);
+        
+        // Update threshold event
+        updateThresholdBtn.addEventListener('click', () => {
+            const newThreshold = parseInt(thresholdInput.value);
+            if (newThreshold > 0) {
+                fetch('/update_threshold', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ threshold: newThreshold })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        currentThreshold = newThreshold;
+                        updateThresholdDisplay();
+                        // Update attendance with new threshold
+                        updateAttendance();
+                    }
+                })
+                .catch(error => console.error('Error updating threshold:', error));
+            }
+        });
+        
+        // Initial attendance data
+        updateAttendance();
+    </script>
+</body>
+</html>
