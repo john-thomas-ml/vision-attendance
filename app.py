@@ -15,7 +15,7 @@ import time
 import json
 
 # Parameters
-model_dir = "fine_tuned_arcface.pth"
+model_dir = "fine_tuned_facenet.pth"
 yolo_model_path = "yolov8n-face.pt"
 image_size = 160
 num_classes = 4  # Number of students (John, Nelda, Parvathy, Safran)
@@ -139,10 +139,10 @@ def load_models():
     # Load YOLOv8 face detection model
     yolo_model = YOLO(yolo_model_path)
     
-    # Load fine-tuned ArcFace model for recognition
-    arcface_model = InceptionResnetV1(pretrained=None, classify=False, num_classes=num_classes)
-    arcface_model.load_state_dict(torch.load(model_dir))
-    arcface_model.eval()
+    # Load fine-tuned Facenet model for recognition
+    facenet_model = InceptionResnetV1(pretrained=None, classify=False, num_classes=num_classes)
+    facenet_model.load_state_dict(torch.load(model_dir))
+    facenet_model.eval()
     
     transform = transforms.Compose([
         transforms.ToPILImage(),
@@ -151,7 +151,7 @@ def load_models():
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
     ])
     
-    return yolo_model, arcface_model, transform
+    return yolo_model, facenet_model, transform
 
 ATTENDANCE_THRESHOLD = THRESHOLD  # Set to default value
 
@@ -248,7 +248,7 @@ def clear_attendance():
     attendance_data = get_attendance_data()
 
 # Process video stream
-def process_frame(frame, yolo_model, arcface_model, transform, reference_embeddings):
+def process_frame(frame, yolo_model, facenet_model, transform, reference_embeddings):
     global face_tracks, face_id_counter, frame_count
     
     try:
@@ -334,7 +334,7 @@ def process_frame(frame, yolo_model, arcface_model, transform, reference_embeddi
             if face_imgs:
                 face_imgs = torch.stack(face_imgs)
                 with torch.no_grad():
-                    embeddings = arcface_model(face_imgs).numpy()
+                    embeddings = facenet_model(face_imgs).numpy()
 
                 for idx, fid in enumerate(face_ids):
                     embedding = embeddings[idx].flatten()
@@ -392,7 +392,7 @@ def gen_frames():
     global camera, is_streaming
     
     # Load models
-    yolo_model, arcface_model, transform = load_models()
+    yolo_model, facenet_model, transform = load_models()
     
     # Load reference embeddings
     reference_embeddings = generate_reference_embeddings(REFERENCE_DIR, STUDENTS)
@@ -403,7 +403,7 @@ def gen_frames():
             break
         
         # Process the frame
-        processed_frame = process_frame(frame, yolo_model, arcface_model, transform, reference_embeddings)
+        processed_frame = process_frame(frame, yolo_model, facenet_model, transform, reference_embeddings)
         
         # Encode the frame as JPEG
         ret, buffer = cv2.imencode('.jpg', processed_frame)
