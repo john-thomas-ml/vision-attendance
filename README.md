@@ -110,14 +110,9 @@ python app.py
 - **Model Loading Errors:** Verify that `fine_tuned_facenet.pth` exists and is in the correct path specified in your scripts.
 - **Dataset Problems:** Confirm that your dataset folder structure and image formats match the expected format.
 
-## License
-
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgements
 
 - [FaceNet PyTorch](https://github.com/timesler/facenet-pytorch)
 - [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics)
-- Contributors and the open-source community for tools and libraries.
 
 ---
