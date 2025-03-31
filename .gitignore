@@ -2,5 +2,5 @@ dataset
 dataset_yolo
 yolov8n-face.pt
 reference_embeddings.pkl
-fine_tuned_arcface.pth
+fine_tuned_facenet.pth
 attendance.db
