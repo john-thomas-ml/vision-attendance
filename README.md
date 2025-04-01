@@ -6,9 +6,9 @@ This project implements an automated attendance tracking system using real-time 
 
 The system consists of two main components:
 
-1. **Model Training (train_facenet.py & attendance.py)**  
+1. **Model Training (train_facenet.py)**  
    - **FaceNet Fine-Tuning:** A script to fine-tune a pre-trained FaceNet model on a custom dataset of student images. Data augmentation (random flips, rotations, color jitter) is applied to improve model robustness.
-   - **Reference Embeddings Generation:** Generates and saves reference face embeddings for each student, which are later used for recognition.
+   - **Reference Embeddings Generation:** The fine-tuned model is used to generate and save reference face embeddings for each student. These embeddings are later used for recognition.
 
 2. **Real-Time Attendance Tracking (app.py & index.html)**  
    - **Face Detection & Recognition:** Uses YOLOv8 (with a face-specific model) to detect faces in a video stream and the fine-tuned FaceNet to extract embeddings. Cosine distance is computed to match live faces with stored reference embeddings.
@@ -49,11 +49,10 @@ pip install torch torchvision facenet-pytorch opencv-python ultralytics flask pi
 ├── dataset/                 # Folder containing sub-folders of student images (e.g., John, Nelda, etc.)
 ├── fine_tuned_facenet.pth   # Fine-tuned FaceNet model (generated after training)
 ├── reference_embeddings.pkl # Saved reference embeddings for each student (generated during attendance setup)
-├── train_facenet.py         # Script for fine-tuning the FaceNet model on your dataset
-├── attendance.py            # Script for generating embeddings and testing attendance logic
+├── train_facenet.py         # Script for fine-tuning the FaceNet model on your dataset and generating reference embeddings
 ├── app.py                   # Flask web application for real-time attendance tracking
 ├── templates/
-│   └── index.html           # Front-end HTML template for the web dashboard (see [index.html](citeturn0file0))
+│   └── index.html           # Front-end HTML template for the web dashboard
 └── README.md                # This file
 ```
 
@@ -71,21 +70,9 @@ pip install torch torchvision facenet-pytorch opencv-python ultralytics flask pi
 
 2. **Generate Reference Embeddings:**
 
-   The attendance system (via both `attendance.py` and `app.py`) will generate reference embeddings for each student based on the fine-tuned model. Ensure that the dataset is properly organized before running the attendance scripts.
+   The web application (app.py) uses the fine-tuned model to generate reference embeddings for each student. Ensure that your dataset is properly organized before running the web application.
 
 ## Running the Attendance System
-
-You have two options to run the attendance system:
-
-### Option 1: Standalone Attendance Script
-
-Run the attendance script directly from the command line (this script prints logs to the console):
-
-```bash
-python attendance.py
-```
-
-### Option 2: Web Application
 
 Start the Flask web application to use the real-time web interface:
 
@@ -97,22 +84,25 @@ python app.py
 - Use the on-screen buttons to start/stop the camera feed and monitor attendance data in real time.
 - Adjust the attendance threshold and clear records using the provided controls.
 
-
 ## Customization
 
-- **Thresholds & Parameters:** You can modify parameters such as the attendance threshold, cosine similarity threshold, and consistency frames directly in the source files (`train_facenet.py`, `attendance.py`, and `app.py`).
-- **Data Augmentation:** Adjust the transformations in `train_facenet.py` to suit your dataset and improve training results.
-- **Web Interface:** The front-end can be customized by editing `templates/index.html`.
+- **Thresholds & Parameters:**  
+  You can modify parameters such as the attendance threshold, cosine similarity threshold, and consistency frames directly in the source files (`train_facenet.py` and `app.py`).
+- **Data Augmentation:**  
+  Adjust the transformations in `train_facenet.py` to suit your dataset and improve training results.
+- **Web Interface:**  
+  The front-end can be customized by editing `templates/index.html`.
 
 ## Troubleshooting
 
-- **Webcam Issues:** Ensure your webcam is connected and not used by another application.
-- **Model Loading Errors:** Verify that `fine_tuned_facenet.pth` exists and is in the correct path specified in your scripts.
-- **Dataset Problems:** Confirm that your dataset folder structure and image formats match the expected format.
+- **Webcam Issues:**  
+  Ensure your webcam is connected and not used by another application.
+- **Model Loading Errors:**  
+  Verify that `fine_tuned_facenet.pth` exists and is in the correct path specified in your scripts.
+- **Dataset Problems:**  
+  Confirm that your dataset folder structure and image formats match the expected format.
 
 ## Acknowledgements
 
 - [FaceNet PyTorch](https://github.com/timesler/facenet-pytorch)
 - [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics)
-
----
