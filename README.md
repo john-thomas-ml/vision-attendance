@@ -90,6 +90,15 @@ pip install torch torchvision facenet-pytorch opencv-python ultralytics flask pi
 3. **Generate Reference Embeddings:**  
    The web application (`app.py`) uses the fine-tuned model to generate reference embeddings for each student (`reference_embeddings.pkl`). These are created automatically when you run the web application if they do not already exist.
 
+## Training Results
+
+The training process was conducted over 6 epochs with early stopping (patience=2). Below are the key metrics achieved:
+
+- **Best Training Accuracy:** 98.21% (Epochs 5 and 6) with a training loss of 0.1189.  
+- **Best Validation Accuracy:** 100.00% (Epoch 3) with a validation loss of 0.4097.  
+- **Lowest Training Loss:** 0.1189 (Epochs 5 and 6).  
+- **Lowest Validation Loss:** 0.2303 (Epoch 5).  
+
 ## Running the Attendance System
 
 Start the Flask web application to use the real-time web interface:
