@@ -21,8 +21,8 @@ image_size = 160
 num_classes = 4  # Number of students (John, Nelda, Parvathy, Safran)
 GRACE_PERIOD = 30  # Time within which detection should continue (in seconds)
 THRESHOLD = 300  # 300 seconds = 5 minutes to mark as present
-CONSISTENCY_FRAMES = 5  # Number of frames for consistent recognition
-COSINE_THRESHOLD = 0.45  # Threshold for face recognition
+CONSISTENCY_FRAMES = 7  # Number of frames for consistent recognition
+COSINE_THRESHOLD = 0.285  # Threshold for face recognition
 YOLO_CONFIDENCE_THRESHOLD = 0.5  # Minimum confidence for YOLOv8 detections
 MAX_TRACKING_DISTANCE = 100  # Maximum distance (in pixels) to track faces
 REFERENCE_DIR = "dataset"

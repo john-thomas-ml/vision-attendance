@@ -1,5 +1,4 @@
 dataset
-dataset_yolo
 yolov8n-face.pt
 reference_embeddings.pkl
 fine_tuned_facenet.pth
